@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../usr/local/src/dpdk"
+		}
+	],
+	"settings": {}
+}

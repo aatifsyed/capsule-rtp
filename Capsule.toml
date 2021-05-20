@@ -1,0 +1,9 @@
+app_name = "test-capsule"
+master_core = 0
+dpdk_args = "--log-level lib.eal:debug"
+
+[[ports]]
+    name = "eth0"
+    device = "net_pcap0"
+    args = "iface=eth0"
+    cores = [0]
