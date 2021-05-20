@@ -4,9 +4,10 @@ use capsule::{
     packets::types::{u16be, u32be},
     SizeOf,
 };
+use std::default::Default;
 use std::ptr::NonNull;
 
-#[derive(Clone, Copy, Debug, SizeOf)]
+#[derive(Clone, Copy, Debug, Default, SizeOf)]
 #[repr(C, packed)]
 struct RtpHeader {
     version_padding_extension_csrc_count: u8,
@@ -54,7 +55,7 @@ impl<P: IpPacket> Packet for Rtp<P> {
     }
 
     fn header_len(&self) -> usize {
-        let minimum = std::mem::size_of::<RtpHeader>();
+        let minimum = RtpHeader::size_of();
         let csrcs = self.csrc_count() as usize * std::mem::size_of::<u32be>();
         minimum + csrcs
     }
@@ -81,18 +82,28 @@ impl<P: IpPacket> Packet for Rtp<P> {
         })
     }
 
-    fn try_push(envelope: Self::Envelope, internal: Internal) -> Result<Self>
+    fn try_push(mut envelope: Self::Envelope, _internal: Internal) -> Result<Self>
     where
         Self: Sized,
     {
-        unimplemented!()
+        let offset = envelope.payload_offset();
+        let mbuf = envelope.mbuf_mut();
+
+        mbuf.extend(offset, RtpHeader::size_of())?;
+        let header = mbuf.write_data(offset, &RtpHeader::default())?;
+
+        Ok(Rtp {
+            envelope,
+            header,
+            offset,
+        })
     }
 
     fn deparse(self) -> Self::Envelope
     where
         Self: Sized,
     {
-        unimplemented!()
+        self.envelope
     }
 }
 
