@@ -53,10 +53,11 @@ COPY --from=rust /root/.rustup /root/.rustup
 COPY --from=rust /root/.cargo /root/.cargo
 ENV PATH /root/.cargo/bin:${PATH}
 
-RUN DEBIAN_FRONTENT="noninteractive" \
+RUN apt update \
+    && \
+    DEBIAN_FRONTEND="noninteractive" \
     TZ="Europe/London" \
-    apt update \
-    && apt install -y \
+    apt install -y \
     build-essential \
     clang \
     curl \
